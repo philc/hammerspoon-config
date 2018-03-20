@@ -153,8 +153,8 @@ hs.hotkey.bind("Ctrl", ".", lib.keypress("shift", "-"), nil, lib.keypress("shift
 remapInAppWithBlacklist({"Emacs", "Org"}, "Ctrl", "W", "Alt", "Delete")
 
 -- Make Cmd-J and Cmd-K switch tabs in all OSX apps.
-remapInAppWithBlacklist({"iTerm"}, {"cmd"}, "J", {"Cmd, Alt"}, "left")
-remapInAppWithBlacklist({"iTerm"}, {"cmd"}, "K", {"Cmd, Alt"}, "right")
+remapInAppWithBlacklist({"iTerm"}, {"cmd"}, "J", {"Cmd", "Alt"}, "left")
+remapInAppWithBlacklist({"iTerm"}, {"cmd"}, "K", {"Cmd", "Alt"}, "right")
 
 remapInApp("Sketch", "Ctrl", "D", nil, "delete")
 
