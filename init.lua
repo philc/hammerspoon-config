@@ -180,6 +180,10 @@ bindHotkeyOnAppFocus("iTerm2", hs.hotkey.new("alt", "E", withTmuxPrefix(lib.keyp
 -- bind C-; as the prefix key directly.
 remapInApp("iTerm2", "ctrl", ";", "ctrl", "y")
 
+-- Make Cmd-H rewind playback by 10s, and Cmd-L advance by 10s.
+remapInApp("VLC", "cmd", "H", {"cmd", "Alt"}, "left")
+remapInApp("VLC", "cmd", "L", {"cmd", "Alt"}, "right")
+
 -----------------
 -- Window layouts
 -----------------
