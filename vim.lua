@@ -20,17 +20,29 @@ function exitAllModes()
   normal:exit()
 end
 
--- Activate this Vim mode by tapping the Cmd key. Tapping it again exits the mode.
--- Note that I've mapped a single tap of "cmd" to F17 using Karabiner-Elements.
-enterNormal = hs.hotkey.bind(nil, "F17", function()
-    if (inNormalMode) then
-      exitAllModes()
-      hs.alert.show('Insert mode')
-    else
-      normal:enter()
-      hs.alert.show('Normal mode')
-    end
-  end)
+function notifyModeChange(message)
+  -- Show this alert in the lower edge of the screen, and make it less pronounced than my default styles.
+  style = {table.unpack(hs.alert.defaultStyle)} -- Copy by value the default style table.
+  style.atScreenEdge = 2
+  style.textSize = 18
+  style.fillColor = {white = 0.05, alpha = 1} -- Use an alpha of 1 because the alerts overlay each other.
+  style.radius = 0
+  hs.alert.show(message, style)
+end
+
+function toggleModes()
+  if (inNormalMode) then
+    exitAllModes()
+    notifyModeChange('Insert mode')
+  else
+    normal:enter()
+    notifyModeChange('Normal mode')
+  end
+end
+
+-- Toggle between insert and normal mode by tapping the Cmd key. Tapping it again exits the mode. Note that
+-- I've mapped a single tap of "cmd" to F17 using Karabiner-Elements.
+enterNormal = hs.hotkey.bind(nil, "F17", toggleModes)
 
 function left() lib.keyStroke({}, "Left") end
 normal:bind({}, 'h', left, nil, left)
@@ -83,28 +95,28 @@ normal:bind({"ctrl"}, "b", function() lib.keyStroke({}, "pageup") end)
 -- i - insert at cursor
 normal:bind({}, 'i', function()
     normal:exit()
-    hs.alert.show('Insert mode')
+    notifyModeChange('Insert mode')
   end)
 
 -- I - insert at beggining of line
 normal:bind({"shift"}, 'i', function()
     lib.keyStroke({"cmd"}, "Left")
     normal:exit()
-    hs.alert.show('Insert mode')
+    notifyModeChange('Insert mode')
   end)
 
 -- a - append after cursor
 normal:bind({}, 'a', function()
     lib.keyStroke({}, "Right")
     normal:exit()
-    hs.alert.show('Insert mode')
+    notifyModeChange('Insert mode')
   end)
 
 -- A - append to end of line
 normal:bind({"shift"}, 'a', function()
     lib.keyStroke({"cmd"}, "Right")
     normal:exit()
-    hs.alert.show('Insert mode')
+    notifyModeChange('Insert mode')
   end)
 
 -- o - open new line below cursor
@@ -116,7 +128,7 @@ normal:bind({}, 'o', nil, function()
       lib.keyStroke({"cmd"}, "Right")
       normal:exit()
       lib.keyStroke({}, "Return")
-      hs.alert.show('Insert mode')
+      notifyModeChange('Insert mode')
     end
   end)
 
@@ -130,7 +142,7 @@ normal:bind({"shift"}, 'o', nil, function()
       normal:exit()
       lib.keyStroke({}, "Return")
       lib.keyStroke({}, "Up")
-      hs.alert.show('Insert mode')
+      notifyModeChange('Insert mode')
     end
   end)
 
@@ -155,13 +167,13 @@ normal:bind({"shift"}, 'D', nil, function()
 -- f, s - call Shortcat
 normal:bind({}, 'f', function()
     normal:exit()
-    hs.alert.show('Insert mode')
+    notifyModeChange('Insert mode')
     lib.keyStroke({"alt"}, "space")
   end)
 
 normal:bind({}, 's', function()
     normal:exit()
-    hs.alert.show('Insert mode')
+    notifyModeChange('Insert mode')
     lib.keyStroke({"alt"}, "space")
   end)
 
@@ -184,14 +196,14 @@ normal:bind({}, 'p', function() lib.keyStroke({"cmd"}, "v") end)
 
 -- v - enter Visual mode
 normal:bind({}, 'v', function() normal:exit() visual:enter() end)
-function visual:entered() hs.alert.show('Visual mode') end
+function visual:entered() notifyModeChange('Visual mode') end
 
 -- <c-[> - exit Visual mode
 visual:bind({"ctrl"}, '[', function()
     visual:exit()
     normal:exit()
     lib.keyStroke({}, "Right")
-    hs.alert.show('Normal mode')
+    notifyModeChange('Normal mode')
   end)
 
 -- Movements
@@ -248,7 +260,7 @@ visual:bind({}, 'y', function()
         visual:exit()
         normal:enter()
         lib.keyStroke({}, "Right")
-        hs.alert.show('Normal mode')
+        notifyModeChange('Normal mode')
       end)
   end)
 
@@ -258,7 +270,7 @@ visual:bind({}, 'p', function()
     visual:exit()
     normal:enter()
     lib.keyStroke({}, "Right")
-    hs.alert.show('Normal mode')
+    notifyModeChange('Normal mode')
   end)
 
 hs.window.filter.new('Emacs')
