@@ -217,7 +217,7 @@ local twoScreenLayout = {
   {"Emacs", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"Google Chrome", nil, leftScreen, hs.layout.left50, nil, nil},
   {"iTerm2", nil, leftScreen, hs.layout.maximized, nil, nil},
-  {"Gmail", nil, leftScreen, hs.layout.maximized, nil, nil},
+  {"Gmail", nil, leftScreen, hs.layout.left50, nil, nil},
   {"GmailPersonal", nil, leftScreen, hs.layout.left50, nil, nil},
   {"GCalendar", nil, leftScreen, hs.layout.left50, nil, nil},
   {"Slack", nil, leftScreen, hs.layout.right50, nil, nil},
