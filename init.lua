@@ -8,6 +8,7 @@
 
 require("vim")
 lib = require("lib")
+log = hs.logger.new("phil", "debug")
 
 -- Shortcut to reload this hammerspoon config.
 -- This is bound early so that the hotkey for reloading the config still works even if there's an issue later
@@ -135,12 +136,24 @@ end
 -- Reference: https://github.com/Hammerspoon/hammerspoon/issues/664
 function remapInAppWithBlacklist(appNames, fromMods, fromKey, toMods, toKey)
   local binding = hs.hotkey.new(fromMods, fromKey, lib.keypress(toMods, toKey), nil, lib.keypress(toMods, toKey))
-  local filter = hs.window.filter.new(appName, false)
-  for _, name in ipairs(appNames) do
-    filter:setAppFilter(name, false)
-  end
-  filter:subscribe(hs.window.filter.windowFocused, function() binding:enable() end)
-  filter:subscribe(hs.window.filter.windowUnfocused, function() binding:disable() end)
+  watcher = hs.application.watcher.new(function(appName, eventType, _)
+      if eventType ~= hs.application.watcher.activated then
+        return nil
+      end
+      local found = false
+      for _, name in ipairs(appNames) do
+        if name == appName then
+          found = true
+        end
+      end
+      if found then
+        binding:disable()
+      else
+        binding:enable()
+      end
+      log.df("%s", hs.inspect(toKey) .. hs.inspect(found))
+    end)
+  watcher:start()
 end
 
 -- I map "," and "." to emit hyphen and underscore because I use these letters often when programming, and my
