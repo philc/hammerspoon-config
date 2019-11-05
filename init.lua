@@ -105,8 +105,8 @@ end
 hs.hotkey.bind(mashApp, "L", function() myLaunchOrFocus("Google Chrome") end)
 hs.hotkey.bind(mashApp, "J", function() myLaunchOrFocus("/Applications/Emacs.app") end)
 hs.hotkey.bind(mashApp, "K", function() myLaunchOrFocus("/Applications/iTerm.app") end)
-hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("Gmail") end)
-hs.hotkey.bind(mashApp, "Y", function() myLaunchOrFocus("GmailPersonal") end)
+hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("SuperHuman") end)
+hs.hotkey.bind(mashApp, "Y", function() myLaunchOrFocus("Firefox") end)
 hs.hotkey.bind(mashApp, ",", function() myLaunchOrFocus("Slack") end)
 hs.hotkey.bind(mashApp, "N", function() myLaunchOrFocus("Terminal") end)
 hs.hotkey.bind({"cmd", "ctrl", "shift"}, 'N', function () myLaunchOrFocus("Spotify") end)
@@ -117,12 +117,16 @@ hs.hotkey.bind(mashApp, "C", function() myLaunchOrFocus("GCalendar") end)
 -- Key remappings
 -----------------
 
+function onAppFocusChange(appName, onFocus, onUnfocus)
+  hs.window.filter.new(appName)
+  :subscribe(hs.window.filter.windowFocused, function() onFocus() end)
+  :subscribe(hs.window.filter.windowUnfocused, function() onUnfocus() end)
+end
+
 -- Binds a hotkey only when an app comes into focus.
 -- @param hotkey: a binding as returned by hs.hotkey.new()
 function bindHotkeyOnAppFocus(appName, hotkey)
-  hs.window.filter.new(appName)
-  :subscribe(hs.window.filter.windowFocused, function() hotkey:enable() end)
-  :subscribe(hs.window.filter.windowUnfocused, function() hotkey:disable() end)
+  onAppFocusChange(appName, function() hotkey:enable() end, function() hotkey:disable() end)
 end
 
 -- Remaps a key only in the given app.
@@ -132,28 +136,14 @@ function remapInApp(appName, fromMods, fromKey, toMods, toKey)
   bindHotkeyOnAppFocus(appName, binding)
 end
 
--- Remaps a key in every app except those in the list provided.
+-- Remaps a key, except for the app provided.
 -- Reference: https://github.com/Hammerspoon/hammerspoon/issues/664
-function remapInAppWithBlacklist(appNames, fromMods, fromKey, toMods, toKey)
+-- TODO(phil): I don't think I need this.
+function remapInAppWithBlacklist(appName, fromMods, fromKey, toMods, toKey)
   local binding = hs.hotkey.new(fromMods, fromKey, lib.keypress(toMods, toKey), nil, lib.keypress(toMods, toKey))
-  watcher = hs.application.watcher.new(function(appName, eventType, _)
-      if eventType ~= hs.application.watcher.activated then
-        return nil
-      end
-      local found = false
-      for _, name in ipairs(appNames) do
-        if name == appName then
-          found = true
-        end
-      end
-      if found then
-        binding:disable()
-      else
-        binding:enable()
-      end
-      log.df("%s", hs.inspect(toKey) .. hs.inspect(found))
-    end)
-  watcher:start()
+  -- TODO: check here to see if the currently focused app is appName. If so, don't enable this binding.
+  binding:enable()
+  onAppFocusChange(appName, function() binding:disable() end, function() binding:enable() end)
 end
 
 -- I map "," and "." to emit hyphen and underscore because I use these letters often when programming, and my
@@ -163,11 +153,18 @@ hs.hotkey.bind("Ctrl", ".", lib.keypress("shift", "-"), nil, lib.keypress("shift
 
 -- Make Ctrl-w behave as "delete word" throughout all of OSX. I don't need this rebound in Emacs, because I
 -- already have it bound to backdelete there.
-remapInAppWithBlacklist({"Emacs", "Org"}, "Ctrl", "W", "Alt", "Delete")
+-- NOTE: I've disabled this because it's flaky: sometimes this hotkey won't get properly bound or unbound when
+-- switching apps. There must be a race condition. I've reimplemented this rule in Karabiner Elements instead.
+-- remapInAppWithBlacklist({"Emacs", "Org"}, "Ctrl", "W", "Alt", "Delete")
 
 -- Make Cmd-J and Cmd-K switch tabs in all OSX apps.
-remapInAppWithBlacklist({"iTerm"}, {"cmd"}, "J", {"Cmd", "Alt"}, "left")
-remapInAppWithBlacklist({"iTerm"}, {"cmd"}, "K", {"Cmd", "Alt"}, "right")
+-- NOTE: I'd like to express these in Karabiner Elements for consistency, but I couldn't get this working.
+-- It also doesn't seem like I need this. Tmxu window switching works fine without iTerm special-casing.
+-- remapInAppWithBlacklist("iTerm", {"cmd"}, "J", {"Cmd", "Alt"}, "left")
+-- remapInAppWithBlacklist("iTerm", {"cmd"}, "K", {"Cmd", "Alt"}, "right")
+hs.hotkey.bind("Cmd", "J", lib.keypress({"Cmd", "Alt"}, "left"), nil, lib.keypress({"Cmd", "Alt"}, "left"))
+hs.hotkey.bind("Cmd", "K", lib.keypress({"Cmd", "Alt"}, "right"), nil, lib.keypress({"Cmd", "Alt"}, "right"))
+-- remapInApp("iTerm2", "Cmd", "J", "Cmd", "J")
 
 remapInApp("Sketch", "Ctrl", "D", nil, "delete")
 
@@ -210,6 +207,8 @@ local threeScreenLayout = {
   {"Google Chrome", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"iTerm2", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"Gmail", nil, leftScreen, hs.layout.maximized, nil, nil},
+  {"SuperHuman", nil, leftScreen, hs.layout.left50, nil, nil},
+  {"Firefox", nil, leftScreen, hs.layout.right50, nil, nil},
   {"GmailPersonal", nil, leftScreen, hs.layout.right50, nil, nil},
   {"GCalendar", nil, centerScreen, hs.layout.left50, nil, nil},
   {"Slack", nil, leftScreen, hs.layout.right50, nil, nil},
@@ -231,6 +230,8 @@ local twoScreenLayout = {
   {"Google Chrome", nil, leftScreen, hs.layout.left50, nil, nil},
   {"iTerm2", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"Gmail", nil, leftScreen, hs.layout.left50, nil, nil},
+  {"SuperHuman", nil, leftScreen, hs.layout.left50, nil, nil},
+  {"Firefox", nil, leftScreen, hs.layout.left50, nil, nil},
   {"GmailPersonal", nil, leftScreen, hs.layout.left50, nil, nil},
   {"GCalendar", nil, leftScreen, hs.layout.left50, nil, nil},
   {"Slack", nil, leftScreen, hs.layout.right50, nil, nil},
