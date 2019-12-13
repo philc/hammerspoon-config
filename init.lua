@@ -103,7 +103,7 @@ function myLaunchOrFocus(appName)
 end
 
 hs.hotkey.bind(mashApp, "L", function() myLaunchOrFocus("Google Chrome") end)
-hs.hotkey.bind(mashApp, "J", function() myLaunchOrFocus("/Applications/Emacs.app") end)
+hs.hotkey.bind(mashApp, "J", function() myLaunchOrFocus("Emacs") end)
 hs.hotkey.bind(mashApp, "K", function() myLaunchOrFocus("/Applications/iTerm.app") end)
 hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("SuperHuman") end)
 hs.hotkey.bind(mashApp, "Y", function() myLaunchOrFocus("Firefox") end)
