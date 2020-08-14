@@ -73,12 +73,28 @@ function moveToScreen(screenPos)
   window:moveToScreen(screen)
 end
 
+-- Toggle the window width to take up 1/3 of the screen vs. 2/3. This is useful for ultrawide monitors.
+function toggleThirds()
+  local win = hs.window.focusedWindow()
+  local f = win:frame()
+  local max = win:screen():frame()
+  if f.w >= max.w / 2 then
+    f.w = max.w / 3
+  else
+    f.w = max.w / 3 * 2
+  end
+  if f.x ~= 0 then
+    f.x = max.x + (max.w - f.w)
+  end
+  win:setFrame(f)
+end
+
 hs.hotkey.bind(mashApp, "1", function() moveToScreen(0) moveLeftHalf() end)
 hs.hotkey.bind(mashApp, "2", function() moveToScreen(0) moveRightHalf() end)
 hs.hotkey.bind(mashApp, "3", function() moveToScreen(-1) moveLeftHalf() end)
 hs.hotkey.bind(mashApp, "4", function() moveToScreen(-1) moveRightHalf() end)
-
 hs.hotkey.bind(mashApp, "M", maximize)
+hs.hotkey.bind({"cmd", "ctrl", "shift"}, "1", toggleThirds)
 
 ---------------------------------
 -- Application focusing shortcuts
