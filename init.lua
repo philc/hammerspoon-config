@@ -139,12 +139,14 @@ hs.hotkey.bind(mashApp, "L", function() myLaunchOrFocus("Google Chrome") end)
 hs.hotkey.bind(mashApp, "J", function() myLaunchOrFocus("Emacs") end)
 hs.hotkey.bind(mashApp, "K", function() myLaunchOrFocus("/Applications/iTerm.app") end)
 hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("SuperHuman") end)
+-- hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("Boxy for Gmail") end)
 hs.hotkey.bind(mashApp, "Y", function() myLaunchOrFocus("Firefox") end)
 hs.hotkey.bind(mashApp, ",", function() myLaunchOrFocus("Slack") end)
 hs.hotkey.bind(mashApp, "N", function() myLaunchOrFocus("Terminal") end)
 hs.hotkey.bind({"cmd", "ctrl", "shift"}, 'N', function () myLaunchOrFocus("Spotify") end)
 hs.hotkey.bind(mashApp, "O", function() myLaunchOrFocus("Org") end)
-hs.hotkey.bind(mashApp, "C", function() myLaunchOrFocus("GCalendar") end)
+hs.hotkey.bind(mashApp, "C", function() myLaunchOrFocus("Boxy for Calendar") end)
+hs.hotkey.bind(mashApp, "V", function() myLaunchOrFocus("VLC") end)
 
 -----------------
 -- Key remappings
@@ -241,9 +243,11 @@ local threeScreenLayout = {
   {"iTerm2", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"Gmail", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"SuperHuman", nil, leftScreen, hs.layout.left50, nil, nil},
+  {"Boxy for Gmail", nil, leftScreen, hs.layout.left50, nil, nil},
   {"Firefox", nil, leftScreen, hs.layout.right50, nil, nil},
   {"GmailPersonal", nil, leftScreen, hs.layout.right50, nil, nil},
-  {"GCalendar", nil, centerScreen, hs.layout.left50, nil, nil},
+  -- {"GCalendar", nil, centerScreen, hs.layout.left50, nil, nil},
+  {"Boxy for Calendar", nil, centerScreen, hs.layout.left50, nil, nil},
   {"Slack", nil, leftScreen, hs.layout.right50, nil, nil},
   {"MacVim", nil, leftScreen, hs.layout.right50, nil, nil},
   {"Org", nil, leftScreen, hs.layout.left50, nil, nil},
@@ -264,9 +268,11 @@ local twoScreenLayout = {
   {"iTerm2", nil, leftScreen, hs.layout.maximized, nil, nil},
   {"Gmail", nil, leftScreen, hs.layout.left50, nil, nil},
   {"SuperHuman", nil, leftScreen, hs.layout.left50, nil, nil},
+  {"Boxy for Gmail", nil, leftScreen, hs.layout.left50, nil, nil},
   {"Firefox", nil, leftScreen, hs.layout.left50, nil, nil},
   {"GmailPersonal", nil, leftScreen, hs.layout.left50, nil, nil},
-  {"GCalendar", nil, leftScreen, hs.layout.left50, nil, nil},
+  -- {"GCalendar", nil, leftScreen, hs.layout.left50, nil, nil},
+  {"Boxy for Calendar", nil, leftScreen, hs.layout.left50, nil, nil},
   {"Slack", nil, leftScreen, hs.layout.right50, nil, nil},
   {"MacVim", nil, leftScreen, hs.layout.right50, nil, nil},
   {"Org", nil, leftScreen, hs.layout.left50, nil, nil},
