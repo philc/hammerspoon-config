@@ -56,6 +56,18 @@ function moveRightHalf()
   win:setFrame(f)
 end
 
+function center()
+  local win = hs.window.focusedWindow()
+  local f = win:frame()
+  local max = win:screen():frame()
+  local width = max.w / 2
+  f.x = width / 2
+  f.y = max.y
+  f.w = width
+  f.h = max.h
+  win:setFrame(f)
+end
+
 function maximize()
   local win = hs.window.focusedWindow()
   local f = win:frame()
@@ -91,8 +103,9 @@ end
 
 hs.hotkey.bind(mashApp, "1", function() moveToScreen(0) moveLeftHalf() end)
 hs.hotkey.bind(mashApp, "2", function() moveToScreen(0) moveRightHalf() end)
-hs.hotkey.bind(mashApp, "3", function() moveToScreen(-1) moveLeftHalf() end)
-hs.hotkey.bind(mashApp, "4", function() moveToScreen(-1) moveRightHalf() end)
+hs.hotkey.bind(mashApp, "3", function() moveToScreen(1) moveLeftHalf() end)
+hs.hotkey.bind(mashApp, "4", function() moveToScreen(1) moveRightHalf() end)
+hs.hotkey.bind(mashApp, "5", function() center() end)
 hs.hotkey.bind(mashApp, "M", maximize)
 hs.hotkey.bind({"cmd", "ctrl", "shift"}, "1", toggleThirds)
 
