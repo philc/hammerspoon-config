@@ -113,8 +113,9 @@ hs.hotkey.bind({"cmd", "ctrl", "shift"}, "1", toggleThirds)
 -- Application focusing shortcuts
 ---------------------------------
 
--- Like hs.application.launchOrFocus, except that it works for apps created using Epichrome.
--- I'm not sure why this implementation has different behavior than hs.application.launchOrFocus.
+-- Similar to hs.application.launchOrFocus, except that if an app is open and has many windows, this will
+-- raise just the most recently-used window, rather than all of the windows of that app. This is IMO essential
+-- for keeping applications with many windows (like Chrome) from stomping over typical tiling setups.
 -- Note that "appName" needs to be a full path to the .app if the app is a symlink, which is the case for all
 -- apps created via `homebrew linkapps`. hs.appfinder.appFromName uses spotlight to find apps, and Spotlight
 -- doesn't index apps which are symlinks. See https://github.com/Homebrew/legacy-homebrew/issues/49033.
@@ -127,6 +128,9 @@ function myLaunchOrFocus(appName)
     windows = app:allWindows()
     if windows[1] then
       windows[1]:focus()
+    else
+      -- This will focus the app and, if there are no windows open, it will open a new window.
+      hs.application.launchOrFocus(appName)
     end
   end
 end
