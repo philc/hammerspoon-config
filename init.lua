@@ -313,6 +313,23 @@ hs.hotkey.bind({"cmd", "shift", "ctrl"}, "l", function()
     os.execute("/Users/phil/scripts/macos/lock_screen.sh")
   end)
 
+-- Hide every app which is not the frontmost.
+hs.hotkey.bind({"cmd", "shift"}, "h", function()
+    -- I'm enumerating through the visible windows because going through hs.application.runningApplications()
+    -- surfaces some applications which hang Hammerspoon when you invoke hide() on them. They may be special
+    -- applications, like Finder. I didn't bother to investigate which applications are hanging Hammerspoon,
+    -- but that's easy to do using print statements and seeing where the hang occurs.
+    local frontmostApp = hs.application.frontmostApplication()
+    local windows = hs.window.visibleWindows()
+    for i = 1, #windows do
+      local w = windows[i]
+      local app = w:application()
+      if app:pid() ~= frontmostApp:pid() then
+        app:hide()
+      end
+    end
+  end)
+
 function getVolumeIncrement()
   local volume = hs.audiodevice.current().volume
   -- When the volume gets near zero, change it in smaller increments. Otherwise even the first increment
