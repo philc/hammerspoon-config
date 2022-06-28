@@ -8,6 +8,7 @@
 
 require("vim")
 lib = require("lib")
+hs.timer = require("hs.timer")
 log = hs.logger.new("phil", "debug")
 
 -- Shortcut to reload this hammerspoon config.
@@ -307,6 +308,62 @@ hs.hotkey.bind(mashApp, "'", switchLayout)
 -------------------
 -- Other shortcuts
 -------------------
+
+-- This is an Alfred/Launchbar replacement I've strung together using fzf, Kitty, and some scripting.
+-- This could possibly be instead built on top of fzf and hs.chooser.
+function launchFuzzyFinder()
+  local attempts = 0
+  local maxAttempts = 100
+  local checkInterval = 0.005
+
+  local app = hs.application.get("kitty")
+  if (app) then
+    -- Close any existing windows, so that one can't hit this hotkey many types and get overlapping windows.
+    local windows = app:allWindows()
+    for i = 1, #windows do
+      windows[i].close()
+    end
+  end
+
+  -- Record which screen is active, so we can open this application chooser window on that same screen.
+  local currentWin = hs.window.focusedWindow()
+  local activeScreen
+  if (currentWin) then
+    activeScreen = currentWin:screen()
+  end
+
+  os.execute("/Users/phil/scripts/macos/file-chooser/invoke-kitty.sh &", true)
+
+  -- Move the window as soon as its opened.
+  -- I've also tried implementing this using hs.application.watcher (ala
+  -- https://gist.github.com/tmandry/a5b1ab6d6ea012c1e8c5) but it has the same latency. The polling approach
+  -- below makes for more straightforward code.
+  hs.timer.doUntil(
+    function()
+      return (attempts >= maxAttempts)
+    end,
+    function()
+      local win = hs.window.focusedWindow()
+      if (win and win:application():name() == "kitty") then
+        local winFrame = win:frame()
+        local screenFrame = activeScreen:frame()
+        local width = screenFrame.w / 2
+        winFrame.x = screenFrame.x + (screenFrame.w - winFrame.w / 2) - winFrame.w
+        winFrame.y = screenFrame.h / 5
+        win:setFrame(winFrame)
+        attempts = maxAttempts
+      else
+        attempts = attempts + 1
+      end
+    end,
+    checkInterval)
+end
+
+-- Open a fuzzy file finder, similar to Alfred and Launchbar. This is my replacement for those apps. Neither
+-- worked well for my basic use case of opening files and applications without ceremony.
+hs.hotkey.bind({"cmd"}, "space", function()
+    launchFuzzyFinder()
+  end)
 
 -- Lock the screen. This may also be possible with hs.caffeinate.lockScreen.
 hs.hotkey.bind({"cmd", "shift", "ctrl"}, "l", function()
