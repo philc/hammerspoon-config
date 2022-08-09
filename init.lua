@@ -62,7 +62,8 @@ function center()
   local f = win:frame()
   local max = win:screen():frame()
   local width = max.w / 2
-  f.x = width / 2
+  -- Position this on the second external display
+  f.x = max.x + width / 2
   f.y = max.y
   f.w = width
   f.h = max.h
