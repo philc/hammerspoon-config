@@ -141,7 +141,6 @@ hs.hotkey.bind(mashApp, "L", function() myLaunchOrFocus("Google Chrome") end)
 hs.hotkey.bind(mashApp, "J", function() myLaunchOrFocus("Emacs") end)
 hs.hotkey.bind(mashApp, "K", function() myLaunchOrFocus("/Applications/iTerm.app") end)
 hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("SuperHuman") end)
--- hs.hotkey.bind(mashApp, "U", function() myLaunchOrFocus("Boxy for Gmail") end)
 hs.hotkey.bind(mashApp, "Y", function() myLaunchOrFocus("Firefox") end)
 hs.hotkey.bind(mashApp, ",", function() myLaunchOrFocus("Slack") end)
 hs.hotkey.bind(mashApp, "N", function() myLaunchOrFocus("Terminal") end)
@@ -190,23 +189,13 @@ end
 hs.hotkey.bind("Ctrl", ",", lib.keypress("-"), nil, lib.keypress("-"))
 hs.hotkey.bind("Ctrl", ".", lib.keypress("shift", "-"), nil, lib.keypress("shift", "-")) -- Underscore.
 
--- Make Ctrl-w behave as "delete word" throughout all of OSX. I don't need this rebound in Emacs, because I
--- already have it bound to backdelete there.
--- NOTE: I've disabled this because it's flaky: sometimes this hotkey won't get properly bound or unbound when
--- switching apps. There must be a race condition. I've reimplemented this rule in Karabiner Elements instead.
--- remapInAppWithBlacklist({"Emacs", "Org"}, "Ctrl", "W", "Alt", "Delete")
-
 -- Make Cmd-J and Cmd-K switch tabs in all OSX apps.
--- NOTE: I'd like to express these in Karabiner Elements for consistency, but I couldn't get this working.
--- It also doesn't seem like I need this. Tmxu window switching works fine without iTerm special-casing.
--- remapInAppWithBlacklist("iTerm", {"cmd"}, "J", {"Cmd", "Alt"}, "left")
--- remapInAppWithBlacklist("iTerm", {"cmd"}, "K", {"Cmd", "Alt"}, "right")
 hs.hotkey.bind("Cmd", "J", lib.keypress({"Cmd", "Alt"}, "left"), nil, lib.keypress({"Cmd", "Alt"}, "left"))
 hs.hotkey.bind("Cmd", "K", lib.keypress({"Cmd", "Alt"}, "right"), nil, lib.keypress({"Cmd", "Alt"}, "right"))
--- remapInApp("iTerm2", "Cmd", "J", "Cmd", "J")
 
 remapInApp("Sketch", "Ctrl", "D", nil, "delete")
 
+-- NOTE(philc): These only work intermittently.
 remapInApp("Spotify", "Shift", ".", "Cmd", "right") -- "Previous track"
 remapInApp("Spotify", "Shift", ",", "Cmd", "left") -- "Next track"
 
