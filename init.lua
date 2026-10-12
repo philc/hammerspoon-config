@@ -8,8 +8,6 @@
 
 require("vim")
 lib = require("lib")
-hs.timer = require("hs.timer")
-log = hs.logger.new("phil", "debug")
 
 -- Shortcut to reload this hammerspoon config.
 -- This is bound early so that the hotkey for reloading the config still works even if there's an issue later
