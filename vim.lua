@@ -21,16 +21,30 @@ function exitAllModes()
 end
 
 function notifyModeChange(message)
-  -- Show this alert in the lower edge of the screen, and make it less pronounced than my default styles.
-  style = {table.unpack(hs.alert.defaultStyle)} -- Copy by value the default style table.
-  style.atScreenEdge = 2
-  style.textSize = 18
-  style.fillColor = {white = 0.05, alpha = 1} -- Use an alpha of 1 because the alerts overlay each other.
-  style.radius = 0
+  -- Show this alert in the lower edge of the screen, and make it less pronounced than the default style.
+  local style = {
+    atScreenEdge = 2,
+    textSize = 18,
+    fillColor = {white = 0.05, alpha = 1}, -- Use an alpha of 1 because the alerts overlay each other.
+    radius = 0,
+  }
   hs.alert.show(message, style)
 end
 
+-- Apps which have their own vim bindings, where these modes should never be active.
+local excludedBundleIds = {
+  ["org.gnu.Emacs"] = true,
+  ["org.alacritty"] = true,
+  ["com.mitchellh.ghostty"] = true,
+}
+
+function isExcludedAppFocused()
+  local app = hs.application.frontmostApplication()
+  return app ~= nil and excludedBundleIds[app:bundleID()] == true
+end
+
 function toggleModes()
+  if isExcludedAppFocused() then return end
   if (inNormalMode) then
     exitAllModes()
     notifyModeChange('Insert mode')
@@ -57,12 +71,12 @@ function down() lib.keyStroke({}, "Down") end
 normal:bind({}, 'j', down, nil, down)
 
 -- Move to the next word.
-function word() lib.keyStroke({"alt"}, "Right") end
+local function word() lib.keyStroke({"alt"}, "Right") end
 normal:bind({}, 'w', word, nil, word)
 normal:bind({}, 'e', word, nil, word)
 
 -- Move to the previous word.
-function back() lib.keyStroke({"alt"}, "Left") end
+local function back() lib.keyStroke({"alt"}, "Left") end
 normal:bind({}, 'b', back, nil, back)
 
 -- Move to the beginning of the line
@@ -225,12 +239,12 @@ function vdown() lib.keyStroke({"shift"}, "Down") end
 visual:bind({}, 'j', vdown, nil, vdown)
 
 -- w - move to next word
-function word() lib.keyStroke({"alt", "shift"}, "Right") end
+local function word() lib.keyStroke({"alt", "shift"}, "Right") end
 visual:bind({}, 'w', word, nil, word)
 visual:bind({}, 'e', word, nil, word)
 
 -- b - move to previous word
-function back() lib.keyStroke({"alt", "shift"}, "Left") end
+local function back() lib.keyStroke({"alt", "shift"}, "Left") end
 visual:bind({}, 'b', back, nil, back)
 
 -- 0, H - move to beginning of line
@@ -246,7 +260,7 @@ visual:bind({"shift"}, 'l', function() lib.keyStroke({"cmd", "shift"}, "Right") 
 -- g - move to beginning of text
 visual:bind({}, 'g', function() lib.keyStroke({"shift", "cmd"}, "Up") end)
 
--- G - move to end of line
+-- G - move to end of text
 visual:bind({"shift"}, 'g', function() lib.keyStroke({"shift", "cmd"}, "Down") end)
 
 -- d, x - delete character before the cursor
@@ -273,16 +287,11 @@ visual:bind({}, 'p', function()
     notifyModeChange('Normal mode')
   end)
 
-hs.window.filter.new('Emacs')
-:subscribe(hs.window.filter.windowFocused, function()
+-- Exit any active mode when switching to an excluded app, so its keys aren't intercepted.
+-- This is global so it doesn't get garbage collected.
+excludedAppWatcher = hs.application.watcher.new(function(appName, eventType, app)
+  if eventType == hs.application.watcher.activated and excludedBundleIds[app:bundleID()] then
     exitAllModes()
-    enterNormal:disable()
-  end)
-:subscribe(hs.window.filter.windowUnfocused, function() enterNormal:enable() end)
-
-hs.window.filter.new('iTerm')
-:subscribe(hs.window.filter.windowFocused, function()
-    exitAllModes()
-    enterNormal:disable()
-  end)
-:subscribe(hs.window.filter.windowUnfocused, function() enterNormal:enable() end)
+  end
+end)
+excludedAppWatcher:start()
